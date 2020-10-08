@@ -19,7 +19,7 @@ bg_colour = pygame.Color('grey12')
 blue = (0, 0, 255)  # powerup color
 
 # Ball split powerup    powerup variables
-xcoordinate = random.randint(-250, 250)
+x_coordinate = random.randint(-250, 250)
 ycoordinate = random.randint(-250, 250)
 is_hit = False
 
@@ -37,7 +37,7 @@ ball2 = pygame.Rect(round(screen_width / 2) - 15, round(screen_height / 2) - 15,
 player = pygame.Rect(player_initial_position["x"], player_initial_position["y"], 10, 140)
 opponent = pygame.Rect(opponent_initial_position["x"], opponent_initial_position["y"], 10, 140)
 # generates a random position for the powerup to spawn
-powerup = pygame.Rect(round(screen_width / 2) - xcoordinate, round(screen_height / 2) - ycoordinate, 50, 50)
+powerup = pygame.Rect(round(screen_width / 2) - x_coordinate, round(screen_height / 2) - ycoordinate, 50, 50)
 
 # Game state variables
 # To add new game modes first create a new Game State variable here. Then go to the Input functions section
