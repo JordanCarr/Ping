@@ -148,7 +148,7 @@ def ball_animation():
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
 
-    # ball collions (ball split powerup)
+    # ball collisions (ball split powerup)
     if not is_hit:  # stops balls from hitting invisible powerup
         if ball.colliderect(powerup):
             ball_speed_x *= -1
