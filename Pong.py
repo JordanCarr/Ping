@@ -16,9 +16,9 @@ pygame.display.set_caption("Pong")
 # Colours
 light_grey = (200, 200, 200)
 bg_colour = pygame.Color('grey12')
-blue = (0, 0, 255)  # powerup color
+blue = (0, 0, 255)  # power-up color
 
-# Ball split powerup    powerup variables
+# Ball split power-up    power-up variables
 x_coordinate = random.randint(-250, 250)
 y_coordinate = random.randint(-250, 250)
 is_hit = False
@@ -32,12 +32,12 @@ opponent_initial_position = {"x": 10, "y": round(screen_height / 2) - 70}
 
 # Game rectangles
 ball = pygame.Rect(ball_initial_position["x"], ball_initial_position["y"], 30, 30)
-# second ball required for ball split powerup
+# second ball required for ball split power-up
 ball2 = pygame.Rect(round(screen_width / 2) - 15, round(screen_height / 2) - 15, 30, 30)
 player = pygame.Rect(player_initial_position["x"], player_initial_position["y"], 10, 140)
 opponent = pygame.Rect(opponent_initial_position["x"], opponent_initial_position["y"], 10, 140)
-# generates a random position for the powerup to spawn
-powerup = pygame.Rect(round(screen_width / 2) - x_coordinate, round(screen_height / 2) - y_coordinate, 50, 50)
+# generates a random position for the power-up to spawn
+power_up = pygame.Rect(round(screen_width / 2) - x_coordinate, round(screen_height / 2) - y_coordinate, 50, 50)
 
 # Game state variables
 # To add new game modes first create a new Game State variable here. Then go to the Input functions section
@@ -148,13 +148,13 @@ def ball_animation():
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
 
-    # ball collisions (ball split powerup)
-    if not is_hit:  # stops balls from hitting invisible powerup
-        if ball.colliderect(powerup):
+    # ball collisions (ball split power-up)
+    if not is_hit:  # stops balls from hitting invisible power-up
+        if ball.colliderect(power_up):
             ball_speed_x *= -1
             ball_speed_y *= -1
             is_hit = True
-            pygame.mixer.Sound.play(score_sound)  # plays sound when powerup is hit
+            pygame.mixer.Sound.play(score_sound)  # plays sound when power-up is hit
     # End ball function
 
 
@@ -282,12 +282,12 @@ def draw_standard_play_area():
 
 # End drawing to screen functions
 
-# Powerup Functions
-def draw_powerup():
-    pygame.draw.ellipse(screen, blue, powerup)
+# power-up Functions
+def draw_power_up():
+    pygame.draw.ellipse(screen, blue, power_up)
 
 
-# Splits ball in two when powerup is hit
+# Splits ball in two when power-up is hit
 def split_ball():
     pygame.draw.ellipse(screen, light_grey, ball2)
     ball2_animation()
@@ -458,9 +458,9 @@ if __name__ == "__main__":
             draw_standard_play_area()
             # Text
             draw_standard_score_text()
-            # checks if powerup is hit
+            # checks if power-up is hit
             if not is_hit:
-                draw_powerup()
+                draw_power_up()
             else:
                 split_ball()
             # Final screen render
@@ -478,9 +478,9 @@ if __name__ == "__main__":
             draw_standard_play_area()
             # Text
             draw_standard_score_text()
-            # checks if powerup is hit
+            # checks if power-up is hit
             if not is_hit:
-                draw_powerup()
+                draw_power_up()
             else:
                 split_ball()
             # Final screen render
