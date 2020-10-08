@@ -492,8 +492,9 @@ if __name__ == "__main__":
         # that state was for easier debugging.
         if in_game and (not one_player or not two_player or not one_frenzy):
             print(f'Pong entered an invalid state where it was in game while '
-                  f'1 player mode was {one_player} and '
-                  f'2 player mode was {two_player}'
-                  f'2 player frenzy mode was {one_frenzy}')
+                  f'1 player mode was {one_player}, '
+                  f'2 player mode was {two_player}, '
+                  f'1 player frenzy mode was {one_frenzy}, '
+                  f'and 2 player frenzy mode was {two_frenzy}')
             pygame.quit()
             sys.exit(1)
