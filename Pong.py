@@ -16,11 +16,11 @@ pygame.display.set_caption("Pong")
 # Colours
 light_grey = (200, 200, 200)
 bg_colour = pygame.Color('grey12')
-blue= (0,0,255) #powerup color
+blue = (0, 0, 255)  # powerup color
 
-#Ball split powerup    powerup variables
-xcoordinate = random.randint(-250,250)
-ycoordinate = random.randint(-250,250)
+# Ball split powerup    powerup variables
+xcoordinate = random.randint(-250, 250)
+ycoordinate = random.randint(-250, 250)
 is_hit = False
 
 # Initial States
@@ -32,10 +32,12 @@ opponent_initial_position = {"x": 10, "y": round(screen_height / 2) - 70}
 
 # Game rectangles
 ball = pygame.Rect(ball_initial_position["x"], ball_initial_position["y"], 30, 30)
-ball2 = pygame.Rect(round(screen_width / 2) - 15, round(screen_height / 2) - 15, 30, 30) #second ball required for ball split powerup
+# second ball required for ball split powerup
+ball2 = pygame.Rect(round(screen_width / 2) - 15, round(screen_height / 2) - 15, 30, 30)
 player = pygame.Rect(player_initial_position["x"], player_initial_position["y"], 10, 140)
 opponent = pygame.Rect(opponent_initial_position["x"], opponent_initial_position["y"], 10, 140)
-powerup = pygame.Rect(round(screen_width / 2) - xcoordinate, round(screen_height / 2) - ycoordinate, 50, 50) #generates a random position for the powerup to spawn
+# generates a random position for the powerup to spawn
+powerup = pygame.Rect(round(screen_width / 2) - xcoordinate, round(screen_height / 2) - ycoordinate, 50, 50)
 
 # Game state variables
 # To add new game modes first create a new Game State variable here. Then go to the Input functions section
@@ -62,6 +64,7 @@ basic_font = pygame.font.Font('freesansbold.ttf', 32)
 # Sound effects
 pong_sound = pygame.mixer.Sound("./media/pong.ogg")
 score_sound = pygame.mixer.Sound("./media/score.ogg")
+
 
 # Reset functions
 def ball_reset():
@@ -144,14 +147,14 @@ def ball_animation():
     # Ball collision (player or opponent)
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
-    
-    #ball collions (ball split powerup)
-    if is_hit == False: #stops balls from hitting invisible powerup
-        if ball.colliderect(powerup): 
+
+    # ball collions (ball split powerup)
+    if is_hit == False:  # stops balls from hitting invisible powerup
+        if ball.colliderect(powerup):
             ball_speed_x *= -1
             ball_speed_y *= -1
             is_hit = True
-            pygame.mixer.Sound.play(score_sound) #plays sound when powerup is hit
+            pygame.mixer.Sound.play(score_sound)  # plays sound when powerup is hit
     # End ball function
 
 
@@ -185,13 +188,14 @@ def ball2_animation():
 
     # Ball collision (player or opponent)
     if ball2.colliderect(player) or ball2.colliderect(opponent):
-        ball2_speed_x *= -1    
+        ball2_speed_x *= -1
 
-    # Ball collion with other ball
+    # Ball collision with other ball
     if ball2.colliderect(ball):
         ball2_speed_x *= -1
-        ball2_speed_y *= -1 
-        pygame.mixer.Sound.play(pong_sound) 
+        ball2_speed_y *= -1
+        pygame.mixer.Sound.play(pong_sound)
+
 
 # Player and opponent functions
 def player_one_animation():
@@ -229,6 +233,7 @@ def ai_animation():
 def draw_background(bg):
     screen.fill(bg)
 
+
 def draw_menu():
     draw_background(bg_colour)
     screen.blit(basic_font.render("PONG", False, light_grey), (600, 200))
@@ -241,7 +246,7 @@ def draw_menu():
     screen.blit(basic_font.render("2 Player Frenzy Mode", False, light_grey), (700, 650))
     screen.blit(basic_font.render("[4]", False, light_grey), (850, 700))
     screen.blit(basic_font.render("[ESC] to Return to Menu", False, light_grey), (450, 800))
-    
+
 
 def draw_standard_opponent():
     pygame.draw.rect(screen, light_grey, opponent)
@@ -273,16 +278,20 @@ def draw_standard_play_area():
     draw_standard_opponent()
     draw_standard_ball()
     draw_center_line()
+
+
 # End drawing to screen functions
 
 # Powerup Functions
 def draw_powerup():
     pygame.draw.ellipse(screen, blue, powerup)
 
-#Splits ball in two when powerup is hit
+
+# Splits ball in two when powerup is hit
 def split_ball():
     pygame.draw.ellipse(screen, light_grey, ball2)
     ball2_animation()
+
 
 # Input functions
 # When creating a new game mode and after creating the game state variable add it to the global list here. Once that is
@@ -449,7 +458,7 @@ if __name__ == "__main__":
             draw_standard_play_area()
             # Text
             draw_standard_score_text()
-            #checks if powerup is hit
+            # checks if powerup is hit
             if is_hit == False:
                 draw_powerup()
             else:
@@ -469,15 +478,13 @@ if __name__ == "__main__":
             draw_standard_play_area()
             # Text
             draw_standard_score_text()
-            #checks if powerup is hit
+            # checks if powerup is hit
             if is_hit == False:
                 draw_powerup()
             else:
                 split_ball()
             # Final screen render
             render_screen()
-
-
 
         # Invalid game state detection and error message
         # when creating a new game mode and after adding the new game loop add the mode's name and state to this code
