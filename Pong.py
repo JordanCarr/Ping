@@ -149,7 +149,7 @@ def ball_animation():
         ball_speed_x *= -1
 
     # ball collions (ball split powerup)
-    if is_hit == False:  # stops balls from hitting invisible powerup
+    if not is_hit:  # stops balls from hitting invisible powerup
         if ball.colliderect(powerup):
             ball_speed_x *= -1
             ball_speed_y *= -1
@@ -459,7 +459,7 @@ if __name__ == "__main__":
             # Text
             draw_standard_score_text()
             # checks if powerup is hit
-            if is_hit == False:
+            if not is_hit:
                 draw_powerup()
             else:
                 split_ball()
@@ -479,7 +479,7 @@ if __name__ == "__main__":
             # Text
             draw_standard_score_text()
             # checks if powerup is hit
-            if is_hit == False:
+            if not is_hit:
                 draw_powerup()
             else:
                 split_ball()
