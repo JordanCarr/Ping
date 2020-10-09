@@ -16,6 +16,12 @@ pygame.display.set_caption("Pong")
 # Colours
 light_grey = (200, 200, 200)
 bg_colour = pygame.Color('grey12')
+blue = (0, 0, 255)  # power-up color
+
+# Ball split power-up    power-up variables
+x_coordinate = random.randint(-250, 250)
+y_coordinate = random.randint(-250, 250)
+is_hit = False
 
 # Initial States
 # Dictionary is accessed like name["key"], these initial state variable allow for latter use of the initial states or
@@ -26,18 +32,26 @@ opponent_initial_position = {"x": 10, "y": round(screen_height / 2) - 70}
 
 # Game rectangles
 ball = pygame.Rect(ball_initial_position["x"], ball_initial_position["y"], 30, 30)
+# second ball required for ball split power-up
+ball2 = pygame.Rect(round(screen_width / 2) - 15, round(screen_height / 2) - 15, 30, 30)
 player = pygame.Rect(player_initial_position["x"], player_initial_position["y"], 10, 140)
 opponent = pygame.Rect(opponent_initial_position["x"], opponent_initial_position["y"], 10, 140)
+# generates a random position for the power-up to spawn
+power_up = pygame.Rect(round(screen_width / 2) - x_coordinate, round(screen_height / 2) - y_coordinate, 50, 50)
 
 # Game state variables
 # To add new game modes first create a new Game State variable here. Then go to the Input functions section
 in_game = False
 one_player = False
 two_player = False
+one_frenzy = False
+two_frenzy = False
 
 # Game variables
 ball_speed_x = 7 * random.choice((1, -1))
 ball_speed_y = 7 * random.choice((1, -1))
+ball2_speed_x = 7 * random.choice((1, -1))
+ball2_speed_y = 7 * random.choice((1, -1))
 player_one_speed = 0
 player_two_speed = 0
 ai_speed = 7
@@ -62,6 +76,17 @@ def ball_reset():
     # start the ball in a random direction
     ball_speed_y *= random.choice((1, -1))
     ball_speed_x *= random.choice((1, -1))
+
+
+def ball2_reset():
+    global ball2_speed_x, ball2_speed_y
+
+    # move ball to the center
+    ball2.center = (round(screen_width / 2), round(screen_height / 2))
+
+    # start the ball in a random direction
+    ball2_speed_y *= random.choice((1, -1))
+    ball2_speed_x *= random.choice((1, -1))
 
 
 def players_reset():
@@ -90,12 +115,9 @@ def reset_game_state():
     score_reset()
 
 
-# End reset functions
-
-
 # Ball function
 def ball_animation():
-    global ball_speed_x, ball_speed_y, player_score, opponent_score
+    global ball_speed_x, ball_speed_y, player_score, opponent_score, is_hit
 
     ball.x += ball_speed_x
     ball.y += ball_speed_y
@@ -126,8 +148,53 @@ def ball_animation():
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
 
+    # ball collisions (ball split power-up)
+    if not is_hit:  # stops balls from hitting invisible power-up
+        if ball.colliderect(power_up):
+            ball_speed_x *= -1
+            ball_speed_y *= -1
+            is_hit = True
+            pygame.mixer.Sound.play(score_sound)  # plays sound when power-up is hit
+    # End ball function
 
-# End ball function
+
+def ball2_animation():
+    global ball2_speed_x, ball2_speed_y, player_score, opponent_score
+
+    ball2.x += ball2_speed_x
+    ball2.y += ball2_speed_y
+
+    # Ball collision (top or bottom)
+    if ball2.top <= 0 or ball2.bottom >= screen_height:
+        pygame.mixer.Sound.play(pong_sound)
+        ball2_speed_y *= -1
+
+    # Player scores
+    if ball2.left <= 0:
+        pygame.mixer.Sound.play(score_sound)
+        player_score += 1
+        ball2_reset()
+
+    # Opponent scores
+    if ball2.right >= screen_width:
+        pygame.mixer.Sound.play(score_sound)
+        opponent_score += 1
+        ball2_reset()
+
+    # Ball collision (left or right)
+    if ball2.left <= 0 or ball2.right >= screen_width:
+        pygame.mixer.Sound.play(pong_sound)
+        ball2_reset()
+
+    # Ball collision (player or opponent)
+    if ball2.colliderect(player) or ball2.colliderect(opponent):
+        ball2_speed_x *= -1
+
+    # Ball collision with other ball
+    if ball2.colliderect(ball):
+        ball2_speed_x *= -1
+        ball2_speed_y *= -1
+        pygame.mixer.Sound.play(pong_sound)
 
 
 # Player and opponent functions
@@ -159,8 +226,6 @@ def ai_animation():
         opponent.top = 0
     if opponent.bottom >= screen_height:
         opponent.bottom = screen_height
-
-
 # End player and opponent functions
 
 
@@ -176,7 +241,11 @@ def draw_menu():
     screen.blit(basic_font.render("[1]", False, light_grey), (350, 450))
     screen.blit(basic_font.render("2 Player", False, light_grey), (800, 400))
     screen.blit(basic_font.render("[2]", False, light_grey), (850, 450))
-    screen.blit(basic_font.render("[ESC] to Return to Menu", False, light_grey), (450, 700))
+    screen.blit(basic_font.render("1 Player Frenzy Mode", False, light_grey), (190, 650))
+    screen.blit(basic_font.render("[3]", False, light_grey), (350, 700))
+    screen.blit(basic_font.render("2 Player Frenzy Mode", False, light_grey), (700, 650))
+    screen.blit(basic_font.render("[4]", False, light_grey), (850, 700))
+    screen.blit(basic_font.render("[ESC] to Return to Menu", False, light_grey), (450, 800))
 
 
 def draw_standard_opponent():
@@ -213,13 +282,23 @@ def draw_standard_play_area():
 
 # End drawing to screen functions
 
+# power-up Functions
+def draw_power_up():
+    pygame.draw.ellipse(screen, blue, power_up)
+
+
+# Splits ball in two when power-up is hit
+def split_ball():
+    pygame.draw.ellipse(screen, light_grey, ball2)
+    ball2_animation()
+
 
 # Input functions
 # When creating a new game mode and after creating the game state variable add it to the global list here. Once that is
 # done choose a key that will select the game mode from the menu. Create an if statement for that key and within it set
 # the in_game variable to True and the new mode's variable to True. From here go to the process_inputs functions.
 def process_menu_inputs(pressed):
-    global in_game, one_player, two_player
+    global in_game, one_player, two_player, one_frenzy, two_frenzy
 
     # For the main menu it doesn't matter if the mode select key is pressed or released so only check for which key
     if pressed.key == pygame.K_1:
@@ -228,6 +307,12 @@ def process_menu_inputs(pressed):
     elif pressed.key == pygame.K_2:
         in_game = True
         two_player = True
+    elif pressed.key == pygame.K_3:
+        in_game = True
+        one_frenzy = True
+    elif pressed.key == pygame.K_4:
+        in_game = True
+        two_frenzy = True
 
 
 def process_one_player_inputs(pressed):
@@ -269,7 +354,7 @@ def process_two_player_inputs(pressed):
 # the mode. Add this function to the in_game part of the 'for pressed ...' loop below on the condition of the mode's
 # game state variable being True. From here go to the Game loop section.
 def process_inputs():
-    global in_game, one_player, two_player
+    global in_game, one_player, two_player, one_frenzy, two_frenzy, is_hit
     events = pygame.event.get()
 
     # This if statement filters through all the event for any that match a quit event. It checks to see if there is
@@ -284,15 +369,14 @@ def process_inputs():
     for pressed in filter(keypress_events, events):
         if in_game:
             if pressed.key == pygame.K_ESCAPE:
+                is_hit = False
                 reset_game_state()
-            elif one_player:
+            elif one_player or one_frenzy:
                 process_one_player_inputs(pressed)
-            elif two_player:
+            elif two_player or two_frenzy:
                 process_two_player_inputs(pressed)
         else:
             process_menu_inputs(pressed)
-
-
 # End input functions
 
 
@@ -305,8 +389,6 @@ def quit_events(event):
 # Takes a pygame event as an input and returns True if it is either a keydown or keyup event, otherwise it returns False
 def keypress_events(event):
     return event.type == pygame.KEYDOWN or event.type == pygame.KEYUP
-
-
 # End filter input functions
 
 
@@ -314,8 +396,6 @@ def keypress_events(event):
 def render_screen():
     pygame.display.flip()
     clock.tick(60)  # redraws the screen every 16.6...ms
-
-
 # End render screen function
 
 
@@ -366,13 +446,55 @@ if __name__ == "__main__":
             # Final screen render
             render_screen()
 
+        # One player frenzy mode loop
+        while in_game and one_frenzy:
+            # Inputs
+            process_inputs()
+            # Animations
+            ball_animation()
+            player_one_animation()
+            ai_animation()
+            # Visuals
+            draw_standard_play_area()
+            # Text
+            draw_standard_score_text()
+            # checks if power-up is hit
+            if not is_hit:
+                draw_power_up()
+            else:
+                split_ball()
+            # Final screen render
+            render_screen()
+
+        # Two player frenzy mode loop
+        while in_game and two_frenzy:
+            # Inputs
+            process_inputs()
+            # Animations
+            ball_animation()
+            player_one_animation()
+            player_two_animation()
+            # Visuals
+            draw_standard_play_area()
+            # Text
+            draw_standard_score_text()
+            # checks if power-up is hit
+            if not is_hit:
+                draw_power_up()
+            else:
+                split_ball()
+            # Final screen render
+            render_screen()
+
         # Invalid game state detection and error message
         # when creating a new game mode and after adding the new game loop add the mode's name and state to this code
         # both in the if statement and in the string. This allows the game to exit if an error occurs and describe what
         # that state was for easier debugging.
-        if in_game and (not one_player or not two_player):
+        if in_game and (not one_player or not two_player or not one_frenzy):
             print(f'Pong entered an invalid state where it was in game while '
-                  f'1 player mode was {one_player} and '
-                  f'2 player mode was {two_player}')
+                  f'1 player mode was {one_player}, '
+                  f'2 player mode was {two_player}, '
+                  f'1 player frenzy mode was {one_frenzy}, '
+                  f'and 2 player frenzy mode was {two_frenzy}')
             pygame.quit()
             sys.exit(1)
