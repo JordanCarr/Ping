@@ -18,10 +18,9 @@ light_grey = (200, 200, 200)
 bg_colour = pygame.Color('grey12')
 blue = (0, 0, 255)  # power-up color
 
-# Ball split power-up    power-up variables
+# Ball split power-up variables
 x_coordinate = random.randint(-250, 250)
 y_coordinate = random.randint(-250, 250)
-is_hit = False
 
 # Initial States
 # Dictionary is accessed like name["key"], these initial state variable allow for latter use of the initial states or
@@ -46,6 +45,7 @@ one_player = False
 two_player = False
 one_frenzy = False
 two_frenzy = False
+activate_split_power_up = False
 
 # Game variables
 ball_speed_x = 7 * random.choice((1, -1))
@@ -113,11 +113,12 @@ def reset_game_state():
     players_reset()
     ball_reset()
     score_reset()
+# End reset functions
 
 
 # Ball function
 def ball_animation():
-    global ball_speed_x, ball_speed_y, player_score, opponent_score, is_hit
+    global ball_speed_x, ball_speed_y, player_score, opponent_score, activate_split_power_up
 
     ball.x += ball_speed_x
     ball.y += ball_speed_y
@@ -149,11 +150,11 @@ def ball_animation():
         ball_speed_x *= -1
 
     # ball collisions (ball split power-up)
-    if not is_hit:  # stops balls from hitting invisible power-up
+    if not activate_split_power_up:  # stops balls from hitting invisible power-up
         if ball.colliderect(power_up):
             ball_speed_x *= -1
             ball_speed_y *= -1
-            is_hit = True
+            activate_split_power_up = True
             pygame.mixer.Sound.play(score_sound)  # plays sound when power-up is hit
     # End ball function
 
@@ -278,11 +279,10 @@ def draw_standard_play_area():
     draw_standard_opponent()
     draw_standard_ball()
     draw_center_line()
-
-
 # End drawing to screen functions
 
-# power-up Functions
+
+# Power-up functions
 def draw_power_up():
     pygame.draw.ellipse(screen, blue, power_up)
 
@@ -291,6 +291,7 @@ def draw_power_up():
 def split_ball():
     pygame.draw.ellipse(screen, light_grey, ball2)
     ball2_animation()
+# End power-up functions
 
 
 # Input functions
@@ -354,7 +355,7 @@ def process_two_player_inputs(pressed):
 # the mode. Add this function to the in_game part of the 'for pressed ...' loop below on the condition of the mode's
 # game state variable being True. From here go to the Game loop section.
 def process_inputs():
-    global in_game, one_player, two_player, one_frenzy, two_frenzy, is_hit
+    global in_game, one_player, two_player, one_frenzy, two_frenzy, activate_split_power_up
     events = pygame.event.get()
 
     # This if statement filters through all the event for any that match a quit event. It checks to see if there is
@@ -369,7 +370,7 @@ def process_inputs():
     for pressed in filter(keypress_events, events):
         if in_game:
             if pressed.key == pygame.K_ESCAPE:
-                is_hit = False
+                activate_split_power_up = False
                 reset_game_state()
             elif one_player or one_frenzy:
                 process_one_player_inputs(pressed)
@@ -459,7 +460,7 @@ if __name__ == "__main__":
             # Text
             draw_standard_score_text()
             # checks if power-up is hit
-            if not is_hit:
+            if not activate_split_power_up:
                 draw_power_up()
             else:
                 split_ball()
@@ -479,7 +480,7 @@ if __name__ == "__main__":
             # Text
             draw_standard_score_text()
             # checks if power-up is hit
-            if not is_hit:
+            if not activate_split_power_up:
                 draw_power_up()
             else:
                 split_ball()
