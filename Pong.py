@@ -491,7 +491,7 @@ if __name__ == "__main__":
         # when creating a new game mode and after adding the new game loop add the mode's name and state to this code
         # both in the if statement and in the string. This allows the game to exit if an error occurs and describe what
         # that state was for easier debugging.
-        if in_game and (not one_player or not two_player or not one_frenzy):
+        if in_game and (not one_player or not two_player or not one_frenzy or not two_frenzy):
             print(f'Pong entered an invalid state where it was in game while '
                   f'1 player mode was {one_player}, '
                   f'2 player mode was {two_player}, '
